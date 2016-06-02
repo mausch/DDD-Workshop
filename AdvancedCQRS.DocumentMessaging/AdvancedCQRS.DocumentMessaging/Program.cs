@@ -8,21 +8,25 @@ namespace AdvancedCQRS.DocumentMessaging
     {
         public static void Main()
         {
-            var cashier = new Cashier(new PrintingOrderHandler());
-            var manager = new Manager(cashier);
+            var startables = new List<IStartable>();
+            var cashier = new QueuedHandler(new Cashier(new PrintingOrderHandler()));
+            startables.Add(cashier);
+            var manager = new QueuedHandler(new Manager(cashier));
+            startables.Add(manager);
             var cook = new Cook(manager);
-            var queuedCooks =
+            var cooks =
                 (from q in Enumerable.Repeat(cook, 3)
                 select new QueuedHandler(cook)).ToList();
-            var cooks = new RoundRobinDispatcher(queuedCooks);
-            var waiter = new Waiter(cooks);
+            startables.AddRange(cooks);
+            var rrCooks = new RoundRobinDispatcher(cooks);
+            var waiter = new Waiter(rrCooks);
 
             for (int i = 1; i < 11; i++)
             {
                 waiter.TakeOrder(i, CreateOrder());
             }
 
-            foreach (var c in queuedCooks)
+            foreach (var c in startables)
                 c.Start();
 
         }
