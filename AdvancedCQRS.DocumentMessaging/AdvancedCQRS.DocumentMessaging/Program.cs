@@ -13,7 +13,7 @@ namespace AdvancedCQRS.DocumentMessaging
             var startables = new List<IStartable>();
             var queues = new List<QueuedHandler>();
 
-            var cashier = new QueuedHandler(new Cashier(new PrintingOrderHandler()), "cashier");
+            var cashier = new QueuedHandler(new Cashier(new NullOrderHandler()), "cashier");
             startables.Add(cashier);
             queues.Add(cashier);
 
