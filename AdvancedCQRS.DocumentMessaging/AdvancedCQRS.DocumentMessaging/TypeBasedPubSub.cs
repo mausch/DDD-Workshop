@@ -32,16 +32,15 @@ namespace AdvancedCQRS.DocumentMessaging
             }
         }
 
-        public void Unsubscribe<THandler, TMessage>(THandler handler) 
+        public void Unsubscribe<TMessage>(IHandle<TMessage> handler) 
             where TMessage: MessageBase
-            where THandler: IHandle<TMessage>
         {
             lock (subscriptionLock)
             {
                 IReadOnlyCollection<object> handlers;
                 handlerMap.TryGetValue(typeof(TMessage).ToString(), out handlers);
                 var newHandlers = handlers ?? Enumerable.Empty<object>();
-                newHandlers = newHandlers.Where(x => !(x is THandler));
+                newHandlers = newHandlers.Where(x => x != handler);
                 handlerMap[typeof(TMessage).ToString()] = newHandlers.ToList();
             }
         }
