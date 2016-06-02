@@ -4,11 +4,11 @@ using Newtonsoft.Json.Linq;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    public class Waiter
+    class Waiter
     {
-        private readonly IHandleOrder _orderHandler;
+        private readonly IPublisher _orderHandler;
 
-        public Waiter(IHandleOrder orderHandler)
+        public Waiter(IPublisher orderHandler)
         {
             _orderHandler = orderHandler;
         }
@@ -25,7 +25,8 @@ namespace AdvancedCQRS.DocumentMessaging
                 order.AddItem(item);
             }
 
-            _orderHandler.Handle(order.InnerItem);
+            _orderHandler.Publish("cook", order.InnerItem);
+            //_orderHandler.Handle(order.InnerItem);
 
             return order.Id;
         }

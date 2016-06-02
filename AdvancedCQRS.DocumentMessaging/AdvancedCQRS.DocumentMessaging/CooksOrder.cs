@@ -6,13 +6,13 @@ using Newtonsoft.Json.Linq;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    public class Cook : IHandleOrder
+    class Cook : IHandleOrder
     {
-        private readonly IHandleOrder _orderHandler;
+        private readonly IPublisher _orderHandler;
         public string Name { get; }
         private readonly int sleepTime;
 
-        public Cook(IHandleOrder orderHandler, string name, int sleepTime)
+        public Cook(IPublisher orderHandler, string name, int sleepTime)
         {
             _orderHandler = orderHandler;
             this.Name = name;
@@ -38,7 +38,7 @@ namespace AdvancedCQRS.DocumentMessaging
             order.Ingredients = string.Join(", ", order.Items.Select(FindIngredients));
             order.CookedAt = DateTime.Now;
 
-            _orderHandler.Handle(order.InnerItem);
+            _orderHandler.Publish("cooked", order.InnerItem);
         }
 
         private string FindIngredients(LineItem item)

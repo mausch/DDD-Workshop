@@ -5,11 +5,11 @@ using Newtonsoft.Json.Linq;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    public class Manager : IHandleOrder
+    class Manager : IHandleOrder
     {
-        private readonly IHandleOrder _orderHandler;
+        private readonly IPublisher _orderHandler;
 
-        public Manager(IHandleOrder orderHandler)
+        public Manager(IPublisher orderHandler)
         {
             _orderHandler = orderHandler;
         }
@@ -24,7 +24,7 @@ namespace AdvancedCQRS.DocumentMessaging
             order.Tax = tax;
             order.Total = totalWithoutTax + tax;
 
-            _orderHandler.Handle(order.InnerItem);
+            _orderHandler.Publish("priced", order.InnerItem);
         }
     }
 

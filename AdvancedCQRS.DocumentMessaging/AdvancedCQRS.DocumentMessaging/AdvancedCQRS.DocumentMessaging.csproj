@@ -54,6 +54,7 @@
     <Compile Include="CashiersOrder.cs" />
     <Compile Include="CooksOrder.cs" />
     <Compile Include="IHandleOrder.cs" />
+    <Compile Include="IPublisher.cs" />
     <Compile Include="IStartable.cs" />
     <Compile Include="LineItem.cs" />
     <Compile Include="ManagersOrder.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="QueuedHandler.cs" />
     <Compile Include="RoundRobinDispatcher.cs" />
     <Compile Include="Tests\WaitersOrderTests.cs" />
+    <Compile Include="TopicBasedPubSub.cs" />
     <Compile Include="WaitersOrder.cs" />
   </ItemGroup>
   <ItemGroup>
