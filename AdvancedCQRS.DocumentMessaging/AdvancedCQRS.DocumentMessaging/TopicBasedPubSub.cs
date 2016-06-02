@@ -7,19 +7,20 @@ namespace AdvancedCQRS.DocumentMessaging
 {
     class TopicBasedPubSub: IPublisher
     {
-        readonly Dictionary<string, IHandleOrder> handlers = new Dictionary<string, IHandleOrder>();
+        readonly Dictionary<Type, object> handlers = new Dictionary<Type, object>();
 
-        public void Publish(string topic, JObject order)
+        public void Publish<TMessage>(TMessage @event) where TMessage : MessageBase
         {
-            IHandleOrder handler;
-            if (!handlers.TryGetValue(topic, out handler))
+            object handler;
+            if (!handlers.TryGetValue(@event.GetType(), out handler))
                 return;
-            handler.Handle(order);
+            var typedhandler = handler as IHandle<TMessage>;
+            typedhandler.Handle(@event);
         }
 
-        public void Subscribe(string topic, IHandleOrder handler)
+        public void Subscribe<TMessage>(IHandle<TMessage> handler) where TMessage: MessageBase
         {
-            handlers[topic] = handler;
+            handlers[typeof(TMessage)] = handler;
         }
 
     }

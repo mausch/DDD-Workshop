@@ -9,13 +9,27 @@ using System.Threading;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    class QueuedHandler : IHandleOrder, IStartable
+    interface IQueuedHandler
     {
-        private readonly ConcurrentQueue<JObject> messageQueue = new ConcurrentQueue<JObject>();
-        private readonly IHandleOrder handler;
+        int Count { get; }
+        string Name { get; }
+    }
+
+    static class QueuedHandler
+    {
+        public static QueuedHandler<T> Create<T>(IHandle<T> handler, string name) where T: MessageBase
+        {
+            return new QueuedHandler<T>(handler, name);
+        }
+    }
+
+    class QueuedHandler<T> : IHandle<T>, IStartable, IQueuedHandler where T: MessageBase
+    {
+        private readonly ConcurrentQueue<T> messageQueue = new ConcurrentQueue<T>();
+        private readonly IHandle<T> handler;
         public string Name { get; }
 
-        public QueuedHandler(IHandleOrder handler, string name)
+        public QueuedHandler(IHandle<T> handler, string name)
         {
             this.handler = handler;
             this.Name = name;
@@ -23,17 +37,12 @@ namespace AdvancedCQRS.DocumentMessaging
 
         public int Count => messageQueue.Count;
 
-        public void Handle(JObject order)
-        {
-            messageQueue.Enqueue(order);
-        }
-
         public void Start()
         {
             new Thread(() => {
                 while (true)
                 {
-                    JObject msg = null;
+                    T msg = null;
                     if (!messageQueue.TryDequeue(out msg)) {
                         continue;
                     }
@@ -41,6 +50,11 @@ namespace AdvancedCQRS.DocumentMessaging
                     Thread.Sleep(1);
                 }
             }).Start();
+        }
+
+        public void Handle(T @event)
+        {
+            messageQueue.Enqueue(@event);
         }
     }
 }

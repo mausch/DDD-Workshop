@@ -1,28 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using System.Threading;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    class MoreFairDispatcher : IHandleOrder
+    static class MoreFairDispatcher
     {
-        private readonly IEnumerable<QueuedHandler> handlers;
+        public static MoreFairDispatcher<T> Create<T>(IEnumerable<QueuedHandler<T>> handlers) where T: MessageBase
+        {
+            return new MoreFairDispatcher<T>(handlers);
+        }
+    }
 
-        public MoreFairDispatcher(IEnumerable<QueuedHandler> handlers)
+    class MoreFairDispatcher<T> : IHandle<T> where T: MessageBase
+    {
+        private readonly IEnumerable<QueuedHandler<T>> handlers;
+
+        public MoreFairDispatcher(IEnumerable<QueuedHandler<T>> handlers)
         {
             this.handlers = handlers;
         }
 
-        public void Handle(JObject order)
+        public void Handle(T @event)
         {
             while (true)
             {
                 var handler = handlers.FirstOrDefault(x => x.Count < 5);
                 if (handler != null)
                 {
-                    handler.Handle(order);
+                    handler.Handle(@event);
                     return;
                 } else
                 {

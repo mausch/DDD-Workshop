@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    class Cook : IHandleOrder
+    class Cook : IHandle<OrderPlaced>
     {
         private readonly IPublisher _orderHandler;
         public string Name { get; }
@@ -27,20 +27,6 @@ namespace AdvancedCQRS.DocumentMessaging
             {"random3", "secret" },
         };
 
-        public void Handle(JObject baseOrder)
-        {
-            //Console.WriteLine(Name + " is cooking");
-            var order = new CooksOrder(baseOrder);
-
-            //var timeToCook = TimeToCook(string.Join(" ", order.Items.Select(x => x.Item)));
-            Thread.Sleep(sleepTime);
-
-            order.Ingredients = string.Join(", ", order.Items.Select(FindIngredients));
-            order.CookedAt = DateTime.Now;
-
-            _orderHandler.Publish("cooked", order.InnerItem);
-        }
-
         private string FindIngredients(LineItem item)
         {
             if (_ingredientsMap.ContainsKey(item.Item))
@@ -51,11 +37,18 @@ namespace AdvancedCQRS.DocumentMessaging
             return _ingredientsMap[$"random{new Random().Next(1, 3)}"];
         }
 
-        private int TimeToCook(string order)
+        public void Handle(OrderPlaced @event)
         {
-            if (order.Contains("burger")) return 3000;
-            if (order.Contains("pancake")) return 1000;
-            return 2000;
+            //Console.WriteLine(Name + " is cooking");
+            var order = new CooksOrder(@event.Order);
+
+            //var timeToCook = TimeToCook(string.Join(" ", order.Items.Select(x => x.Item)));
+            Thread.Sleep(sleepTime);
+
+            order.Ingredients = string.Join(", ", order.Items.Select(FindIngredients));
+            order.CookedAt = DateTime.Now;
+
+            _orderHandler.Publish(new FoodCooked(order.InnerItem));
         }
     }
 

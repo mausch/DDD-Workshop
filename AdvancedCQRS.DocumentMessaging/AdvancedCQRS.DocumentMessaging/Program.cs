@@ -11,33 +11,33 @@ namespace AdvancedCQRS.DocumentMessaging
         public static void Main()
         {
             var startables = new List<IStartable>();
-            var queues = new List<QueuedHandler>();
+            var queues = new List<IQueuedHandler>();
 
             var pubsub = new TopicBasedPubSub();
 
-            var cashier = new QueuedHandler(new Cashier(pubsub), "cashier");
+            var cashier = QueuedHandler.Create(new Cashier(pubsub), "cashier");
             startables.Add(cashier);
             queues.Add(cashier);
-            pubsub.Subscribe("priced", cashier);
+            pubsub.Subscribe(cashier);
 
-            var manager = new QueuedHandler(new Manager(pubsub), "manager");
+            var manager = QueuedHandler.Create(new Manager(pubsub), "manager");
             startables.Add(manager);
             queues.Add(manager);
-            pubsub.Subscribe("cooked", manager);
+            pubsub.Subscribe(manager);
 
             var rnd = new Random();
             var cooks = new[] {
                 new Cook(pubsub, "Tom", rnd.Next(10, 1000)),
                 new Cook(pubsub, "Jane", rnd.Next(10, 1000)),
                 new Cook(pubsub, "Dan", rnd.Next(10, 1000)),
-            }.Select(x => new QueuedHandler(x, x.Name)).ToList();
+            }.Select(x => QueuedHandler.Create(x, x.Name)).ToList();
             startables.AddRange(cooks);
             queues.AddRange(cooks);
 
-            var rrCooks = new QueuedHandler(new MoreFairDispatcher(cooks), "fair dispatcher");
+            var rrCooks = QueuedHandler.Create(MoreFairDispatcher.Create(cooks), "fair dispatcher");
             startables.Add(rrCooks);
             queues.Add(rrCooks);
-            pubsub.Subscribe("cook", rrCooks);
+            pubsub.Subscribe(rrCooks);
 
             var waiter = new Waiter(pubsub);
 

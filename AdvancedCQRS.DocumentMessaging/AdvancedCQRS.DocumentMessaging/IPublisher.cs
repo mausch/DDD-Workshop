@@ -5,6 +5,6 @@ namespace AdvancedCQRS.DocumentMessaging
 {
     interface IPublisher
     {
-        void Publish(string topic, JObject order);
+        void Publish<T>(T @event) where T: MessageBase;
     }
 }

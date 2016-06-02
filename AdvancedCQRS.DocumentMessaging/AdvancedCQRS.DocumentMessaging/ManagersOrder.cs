@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -5,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    class Manager : IHandleOrder
+    class Manager : IHandle<FoodCooked>
     {
         private readonly IPublisher _orderHandler;
 
@@ -14,9 +15,9 @@ namespace AdvancedCQRS.DocumentMessaging
             _orderHandler = orderHandler;
         }
 
-        public void Handle(JObject baseOrder)
+        public void Handle(FoodCooked @event)
         {
-            var order = new ManagersOrder(baseOrder);
+            var order = new ManagersOrder(@event.Order);
 
             var totalWithoutTax = order.Items.Sum(item => item.Quantity * item.Price);
             var tax = (int)(totalWithoutTax * 0.2);
@@ -24,7 +25,7 @@ namespace AdvancedCQRS.DocumentMessaging
             order.Tax = tax;
             order.Total = totalWithoutTax + tax;
 
-            _orderHandler.Publish("priced", order.InnerItem);
+            _orderHandler.Publish(new OrderPriced(order.InnerItem));
         }
     }
 
