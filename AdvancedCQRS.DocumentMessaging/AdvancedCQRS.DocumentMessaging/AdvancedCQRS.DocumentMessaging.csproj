@@ -60,6 +60,7 @@
     <Compile Include="PrintingOrderHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RoundRobinDispatcher.cs" />
     <Compile Include="Tests\WaitersOrderTests.cs" />
     <Compile Include="WaitersOrder.cs" />
   </ItemGroup>
