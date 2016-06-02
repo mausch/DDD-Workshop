@@ -13,11 +13,15 @@ namespace AdvancedCQRS.DocumentMessaging
     {
         private readonly ConcurrentQueue<JObject> messageQueue = new ConcurrentQueue<JObject>();
         private readonly IHandleOrder handler;
+        public string Name { get; }
 
-        public QueuedHandler(IHandleOrder handler)
+        public QueuedHandler(IHandleOrder handler, string name)
         {
             this.handler = handler;
+            this.Name = name;
         }
+
+        public int Count => messageQueue.Count;
 
         public void Handle(JObject order)
         {

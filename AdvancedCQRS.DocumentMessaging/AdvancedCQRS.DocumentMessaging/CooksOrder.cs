@@ -9,13 +9,13 @@ namespace AdvancedCQRS.DocumentMessaging
     public class Cook : IHandleOrder
     {
         private readonly IHandleOrder _orderHandler;
-        private readonly string name;
+        public string Name { get; }
         private readonly int sleepTime;
 
         public Cook(IHandleOrder orderHandler, string name, int sleepTime)
         {
             _orderHandler = orderHandler;
-            this.name = name;
+            this.Name = name;
             this.sleepTime = sleepTime;
         }
 
@@ -29,7 +29,7 @@ namespace AdvancedCQRS.DocumentMessaging
 
         public void Handle(JObject baseOrder)
         {
-            Console.WriteLine(name + " is cooking");
+            Console.WriteLine(Name + " is cooking");
             var order = new CooksOrder(baseOrder);
 
             //var timeToCook = TimeToCook(string.Join(" ", order.Items.Select(x => x.Item)));

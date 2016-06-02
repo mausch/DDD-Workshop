@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using System;
+using System.Threading;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
@@ -10,17 +11,25 @@ namespace AdvancedCQRS.DocumentMessaging
         public static void Main()
         {
             var startables = new List<IStartable>();
-            var cashier = new QueuedHandler(new Cashier(new PrintingOrderHandler()));
+            var queues = new List<QueuedHandler>();
+
+            var cashier = new QueuedHandler(new Cashier(new PrintingOrderHandler()), "cashier");
             startables.Add(cashier);
-            var manager = new QueuedHandler(new Manager(cashier));
+            queues.Add(cashier);
+
+            var manager = new QueuedHandler(new Manager(cashier), "manager");
             startables.Add(manager);
+            queues.Add(manager);
+
             var rnd = new Random();
             var cooks = new[] {
                 new Cook(manager, "Tom", rnd.Next(10, 1000)),
                 new Cook(manager, "Jane", rnd.Next(10, 1000)),
                 new Cook(manager, "Dan", rnd.Next(10, 1000)),
-            }.Select(x => new QueuedHandler(x)).ToList();
+            }.Select(x => new QueuedHandler(x, x.Name)).ToList();
             startables.AddRange(cooks);
+            queues.AddRange(cooks);
+
             var rrCooks = new RoundRobinDispatcher(cooks);
             var waiter = new Waiter(rrCooks);
 
@@ -32,6 +41,12 @@ namespace AdvancedCQRS.DocumentMessaging
             foreach (var c in startables)
                 c.Start();
 
+            var timer = new System.Timers.Timer(1000);
+            timer.Elapsed += (sender, e) => {
+                foreach (var q in queues)
+                    Console.WriteLine($"{q.Name} queue size: {q.Count}");
+            };
+            timer.Start();
         }
 
         private static IEnumerable<LineItem> CreateOrder()
