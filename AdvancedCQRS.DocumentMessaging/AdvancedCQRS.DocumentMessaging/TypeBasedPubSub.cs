@@ -7,20 +7,35 @@ namespace AdvancedCQRS.DocumentMessaging
 {
     class TypeBasedPubSub: IPublisher
     {
-        readonly Dictionary<Type, object> handlers = new Dictionary<Type, object>();
+        readonly Dictionary<Type, IReadOnlyCollection<object>> handlerMap = new Dictionary<Type, IReadOnlyCollection<object>>();
 
         public void Publish<TMessage>(TMessage @event) where TMessage : MessageBase
         {
-            object handler;
-            if (!handlers.TryGetValue(@event.GetType(), out handler))
+            IReadOnlyCollection<object> handler;
+            if (!handlerMap.TryGetValue(@event.GetType(), out handler))
                 return;
-            var typedhandler = handler as IHandle<TMessage>;
-            typedhandler.Handle(@event);
+            var typedhandlers = handler.Select(x => x as IHandle<TMessage>);
+            foreach (var h in typedhandlers)
+                h.Handle(@event);
         }
+
+        readonly object subscriptionLock = new object();
 
         public void Subscribe<TMessage>(IHandle<TMessage> handler) where TMessage: MessageBase
         {
-            handlers[typeof(TMessage)] = handler;
+            lock (subscriptionLock)
+            {
+                IReadOnlyCollection<object> handlers;
+                handlerMap.TryGetValue(typeof(TMessage), out handlers);
+                var newHandlers = handlers?.ToList() ?? new List<object>();
+                newHandlers.Add(handler);
+                handlerMap[typeof(TMessage)] = newHandlers;
+            }
+        }
+
+        public void Unsubscribe<TMessage>(IHandle<TMessage> handler) where TMessage: MessageBase
+        {
+            //lock (subscriptionLock)
         }
 
     }
