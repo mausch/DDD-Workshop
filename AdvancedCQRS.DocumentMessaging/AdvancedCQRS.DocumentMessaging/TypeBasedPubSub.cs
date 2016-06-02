@@ -6,12 +6,12 @@ namespace AdvancedCQRS.DocumentMessaging
 {
     class TypeBasedPubSub: IPublisher
     {
-        readonly Dictionary<Type, IReadOnlyCollection<object>> handlerMap = new Dictionary<Type, IReadOnlyCollection<object>>();
+        readonly Dictionary<string, IReadOnlyCollection<object>> handlerMap = new Dictionary<string, IReadOnlyCollection<object>>();
 
         public void Publish<TMessage>(TMessage @event) where TMessage : MessageBase
         {
             IReadOnlyCollection<object> handler;
-            if (!handlerMap.TryGetValue(@event.GetType(), out handler))
+            if (!handlerMap.TryGetValue(@event.GetType().ToString(), out handler))
                 return;
             var typedhandlers = handler.Select(x => x as IHandle<TMessage>);
             foreach (var h in typedhandlers)
@@ -25,10 +25,10 @@ namespace AdvancedCQRS.DocumentMessaging
             lock (subscriptionLock)
             {
                 IReadOnlyCollection<object> handlers;
-                handlerMap.TryGetValue(typeof(TMessage), out handlers);
+                handlerMap.TryGetValue(typeof(TMessage).ToString(), out handlers);
                 var newHandlers = handlers?.ToList() ?? new List<object>();
                 newHandlers.Add(handler);
-                handlerMap[typeof(TMessage)] = newHandlers;
+                handlerMap[typeof(TMessage).ToString()] = newHandlers;
             }
         }
 
@@ -39,10 +39,10 @@ namespace AdvancedCQRS.DocumentMessaging
             lock (subscriptionLock)
             {
                 IReadOnlyCollection<object> handlers;
-                handlerMap.TryGetValue(typeof(TMessage), out handlers);
+                handlerMap.TryGetValue(typeof(TMessage).ToString(), out handlers);
                 var newHandlers = handlers ?? Enumerable.Empty<object>();
                 newHandlers = newHandlers.Where(x => !(x is THandler));
-                handlerMap[typeof(TMessage)] = newHandlers.ToList();
+                handlerMap[typeof(TMessage).ToString()] = newHandlers.ToList();
             }
         }
 
