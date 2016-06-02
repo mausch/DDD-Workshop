@@ -30,10 +30,13 @@ namespace AdvancedCQRS.DocumentMessaging
             startables.AddRange(cooks);
             queues.AddRange(cooks);
 
-            var rrCooks = new RoundRobinDispatcher(cooks);
+            var rrCooks = new QueuedHandler(new MoreFairDispatcher(cooks), "fair dispatcher");
+            startables.Add(rrCooks);
+            queues.Add(rrCooks);
+
             var waiter = new Waiter(rrCooks);
 
-            for (int i = 1; i < 11; i++)
+            for (int i = 1; i < 300; i++)
             {
                 waiter.TakeOrder(i, CreateOrder());
             }
@@ -43,6 +46,7 @@ namespace AdvancedCQRS.DocumentMessaging
 
             var timer = new System.Timers.Timer(1000);
             timer.Elapsed += (sender, e) => {
+                Console.WriteLine();
                 foreach (var q in queues)
                     Console.WriteLine($"{q.Name} queue size: {q.Count}");
             };

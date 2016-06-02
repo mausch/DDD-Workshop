@@ -29,7 +29,7 @@ namespace AdvancedCQRS.DocumentMessaging
 
         public void Handle(JObject baseOrder)
         {
-            Console.WriteLine(Name + " is cooking");
+            //Console.WriteLine(Name + " is cooking");
             var order = new CooksOrder(baseOrder);
 
             //var timeToCook = TimeToCook(string.Join(" ", order.Items.Select(x => x.Item)));
