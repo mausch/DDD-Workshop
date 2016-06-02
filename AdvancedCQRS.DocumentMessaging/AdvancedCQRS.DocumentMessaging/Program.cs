@@ -10,7 +10,8 @@ namespace AdvancedCQRS.DocumentMessaging
             var cashier = new Cashier(new PrintingOrderHandler());
             var manager = new Manager(cashier);
             var cook = new Cook(manager);
-            var waiter = new Waiter(cook);
+            var cooks = new Multiplexor(new[] { cook, cook, cook });
+            var waiter = new Waiter(cooks);
 
             for (int i = 1; i < 11; i++)
             {
