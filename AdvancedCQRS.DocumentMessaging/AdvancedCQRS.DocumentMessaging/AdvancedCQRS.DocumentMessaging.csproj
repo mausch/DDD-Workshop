@@ -53,10 +53,8 @@
   <ItemGroup>
     <Compile Include="CashiersOrder.cs" />
     <Compile Include="CooksOrder.cs" />
-    <Compile Include="IHandleOrder.cs" />
     <Compile Include="LineItem.cs" />
     <Compile Include="ManagersOrder.cs" />
-    <Compile Include="PrintingOrderHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\WaitersOrderTests.cs" />

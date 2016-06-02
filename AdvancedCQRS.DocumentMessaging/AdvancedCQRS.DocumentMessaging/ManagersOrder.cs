@@ -5,16 +5,9 @@ using Newtonsoft.Json.Linq;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    public class Manager : IHandleOrder
+    public class Manager
     {
-        private readonly IHandleOrder _orderHandler;
-
-        public Manager(IHandleOrder orderHandler)
-        {
-            _orderHandler = orderHandler;
-        }
-
-        public void Handle(JObject baseOrder)
+        public static JObject Handle(JObject baseOrder)
         {
             var order = new ManagersOrder(baseOrder);
 
@@ -24,7 +17,7 @@ namespace AdvancedCQRS.DocumentMessaging
             order.Tax = tax;
             order.Total = totalWithoutTax + tax;
 
-            _orderHandler.Handle(order.InnerItem);
+            return order.InnerItem;
         }
     }
 

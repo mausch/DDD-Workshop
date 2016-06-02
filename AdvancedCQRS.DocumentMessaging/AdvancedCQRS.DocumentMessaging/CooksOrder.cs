@@ -6,16 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    public class Cook : IHandleOrder
+    public class Cook
     {
-        private readonly IHandleOrder _orderHandler;
-
-        public Cook(IHandleOrder orderHandler)
-        {
-            _orderHandler = orderHandler;
-        }
-
-        private readonly Dictionary<string, string> _ingredientsMap = new Dictionary<string, string>
+        private static readonly IReadOnlyDictionary<string, string> _ingredientsMap = new Dictionary<string, string>
         {
             {"razor blade ice cream", "razor blades, ice cream" },
             {"random1", "meat, tomatos" },
@@ -23,7 +16,7 @@ namespace AdvancedCQRS.DocumentMessaging
             {"random3", "secret" },
         };
 
-        public void Handle(JObject baseOrder)
+        public static JObject Handle(JObject baseOrder)
         {
             var order = new CooksOrder(baseOrder);
 
@@ -33,10 +26,10 @@ namespace AdvancedCQRS.DocumentMessaging
             order.Ingredients = string.Join(", ", order.Items.Select(FindIngredients));
             order.CookedAt = DateTime.Now;
 
-            _orderHandler.Handle(order.InnerItem);
+            return order.InnerItem;
         }
 
-        private string FindIngredients(LineItem item)
+        private static string FindIngredients(LineItem item)
         {
             if (_ingredientsMap.ContainsKey(item.Item))
             {
@@ -46,7 +39,7 @@ namespace AdvancedCQRS.DocumentMessaging
             return _ingredientsMap[$"random{new Random().Next(1, 3)}"];
         }
 
-        private int TimeToCook(string order)
+        private static int TimeToCook(string order)
         {
             if (order.Contains("burger")) return 3000;
             if (order.Contains("pancake")) return 1000;

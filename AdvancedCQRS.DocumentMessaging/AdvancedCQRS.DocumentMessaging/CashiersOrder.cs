@@ -2,21 +2,14 @@ using Newtonsoft.Json.Linq;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    public class Cashier : IHandleOrder
+    public class Cashier
     {
-        private readonly IHandleOrder _orderHandler;
-
-        public Cashier(IHandleOrder orderHandler)
-        {
-            _orderHandler = orderHandler;
-        }
-
-        public void Handle(JObject baseOrder)
+        public static JObject Handle(JObject baseOrder)
         {
             var order = new CashiersOrder(baseOrder);
             order.IsPaid = true;
 
-            _orderHandler.Handle(order.InnerItem);
+            return order.InnerItem;
         }
     }
 

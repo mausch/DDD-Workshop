@@ -6,14 +6,7 @@ namespace AdvancedCQRS.DocumentMessaging
 {
     public class Waiter
     {
-        private readonly IHandleOrder _orderHandler;
-
-        public Waiter(IHandleOrder orderHandler)
-        {
-            _orderHandler = orderHandler;
-        }
-
-        public Guid TakeOrder(int tableNumber, IEnumerable<LineItem> items)
+        public static Tuple<Guid, JObject> TakeOrder(int tableNumber, IEnumerable<LineItem> items)
         {
             var order = new WaitersOrder(new JObject());
             order.Id = Guid.NewGuid();
@@ -25,9 +18,7 @@ namespace AdvancedCQRS.DocumentMessaging
                 order.AddItem(item);
             }
 
-            _orderHandler.Handle(order.InnerItem);
-
-            return order.Id;
+            return Tuple.Create(order.Id, order.InnerItem);
         }
     }
 
