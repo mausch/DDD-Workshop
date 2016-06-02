@@ -10,10 +10,10 @@ namespace AdvancedCQRS.DocumentMessaging
 
         public void Publish<TMessage>(TMessage @event) where TMessage : MessageBase
         {
-            IReadOnlyCollection<object> handler;
-            if (!handlerMap.TryGetValue(@event.GetType().ToString(), out handler))
+            IReadOnlyCollection<object> handlers;
+            if (!handlerMap.TryGetValue(@event.GetType().ToString(), out handlers))
                 return;
-            var typedhandlers = handler.Select(x => x as IHandle<TMessage>);
+            var typedhandlers = handlers.Select(x => x as IHandle<TMessage>);
             foreach (var h in typedhandlers)
                 h.Handle(@event);
         }
