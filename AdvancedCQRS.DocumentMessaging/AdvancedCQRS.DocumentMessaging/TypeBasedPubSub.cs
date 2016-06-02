@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    class TopicBasedPubSub: IPublisher
+    class TypeBasedPubSub: IPublisher
     {
         readonly Dictionary<Type, object> handlers = new Dictionary<Type, object>();
 

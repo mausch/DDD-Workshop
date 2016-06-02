@@ -13,7 +13,7 @@ namespace AdvancedCQRS.DocumentMessaging
             var startables = new List<IStartable>();
             var queues = new List<IQueuedHandler>();
 
-            var pubsub = new TopicBasedPubSub();
+            var pubsub = new TypeBasedPubSub();
 
             var cashier = QueuedHandler.Create(new Cashier(pubsub), "cashier");
             startables.Add(cashier);

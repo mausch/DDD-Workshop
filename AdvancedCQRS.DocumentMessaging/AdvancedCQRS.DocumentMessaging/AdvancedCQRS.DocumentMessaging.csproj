@@ -68,7 +68,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueuedHandler.cs" />
     <Compile Include="Tests\WaitersOrderTests.cs" />
-    <Compile Include="TopicBasedPubSub.cs" />
+    <Compile Include="TypeBasedPubSub.cs" />
     <Compile Include="WaitersOrder.cs" />
   </ItemGroup>
   <ItemGroup>
