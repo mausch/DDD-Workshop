@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -33,9 +32,18 @@ namespace AdvancedCQRS.DocumentMessaging
             }
         }
 
-        public void Unsubscribe<TMessage>(IHandle<TMessage> handler) where TMessage: MessageBase
+        public void Unsubscribe<THandler, TMessage>(THandler handler) 
+            where TMessage: MessageBase
+            where THandler: IHandle<TMessage>
         {
-            //lock (subscriptionLock)
+            lock (subscriptionLock)
+            {
+                IReadOnlyCollection<object> handlers;
+                handlerMap.TryGetValue(typeof(TMessage), out handlers);
+                var newHandlers = handlers ?? Enumerable.Empty<object>();
+                newHandlers = newHandlers.Where(x => !(x is THandler));
+                handlerMap[typeof(TMessage)] = newHandlers.ToList();
+            }
         }
 
     }
