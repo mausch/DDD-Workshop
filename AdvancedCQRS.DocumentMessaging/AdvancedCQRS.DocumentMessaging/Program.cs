@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using System;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
@@ -13,10 +14,12 @@ namespace AdvancedCQRS.DocumentMessaging
             startables.Add(cashier);
             var manager = new QueuedHandler(new Manager(cashier));
             startables.Add(manager);
-            var cook = new Cook(manager);
-            var cooks =
-                (from q in Enumerable.Repeat(cook, 3)
-                select new QueuedHandler(cook)).ToList();
+            var rnd = new Random();
+            var cooks = new[] {
+                new Cook(manager, "Tom", rnd.Next(10, 1000)),
+                new Cook(manager, "Jane", rnd.Next(10, 1000)),
+                new Cook(manager, "Dan", rnd.Next(10, 1000)),
+            }.Select(x => new QueuedHandler(x)).ToList();
             startables.AddRange(cooks);
             var rrCooks = new RoundRobinDispatcher(cooks);
             var waiter = new Waiter(rrCooks);

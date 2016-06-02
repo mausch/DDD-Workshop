@@ -9,10 +9,14 @@ namespace AdvancedCQRS.DocumentMessaging
     public class Cook : IHandleOrder
     {
         private readonly IHandleOrder _orderHandler;
+        private readonly string name;
+        private readonly int sleepTime;
 
-        public Cook(IHandleOrder orderHandler)
+        public Cook(IHandleOrder orderHandler, string name, int sleepTime)
         {
             _orderHandler = orderHandler;
+            this.name = name;
+            this.sleepTime = sleepTime;
         }
 
         private readonly Dictionary<string, string> _ingredientsMap = new Dictionary<string, string>
@@ -25,10 +29,11 @@ namespace AdvancedCQRS.DocumentMessaging
 
         public void Handle(JObject baseOrder)
         {
+            Console.WriteLine(name + " is cooking");
             var order = new CooksOrder(baseOrder);
 
-            var timeToCook = TimeToCook(string.Join(" ", order.Items.Select(x => x.Item)));
-            Thread.Sleep(timeToCook);
+            //var timeToCook = TimeToCook(string.Join(" ", order.Items.Select(x => x.Item)));
+            Thread.Sleep(sleepTime);
 
             order.Ingredients = string.Join(", ", order.Items.Select(FindIngredients));
             order.CookedAt = DateTime.Now;
