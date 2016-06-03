@@ -11,7 +11,7 @@ namespace AdvancedCQRS.DocumentMessaging
     {
         public JObject Order { get; }
 
-        public CookFood(JObject Order, MessageBase cause): base(cause.CorrelationId, cause.CauseId)
+        public CookFood(JObject Order, MessageBase cause): base(cause.CorrelationId, cause.Id)
         {
             this.Order = Order;
         }

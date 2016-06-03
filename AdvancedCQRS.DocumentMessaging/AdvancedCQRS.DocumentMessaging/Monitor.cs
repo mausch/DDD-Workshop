@@ -10,7 +10,7 @@ namespace AdvancedCQRS.DocumentMessaging
     {
         public void Handle(MessageBase @event)
         {
-            Console.WriteLine($"{@event} id {@event.Id} correlation {@event.CorrelationId} cause {@event.CauseId}");
+            Console.WriteLine($"{@event.GetType().Name} id {@event.Id} correlation {@event.CorrelationId} cause {@event.CauseId}");
         }
     }
 }

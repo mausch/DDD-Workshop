@@ -10,7 +10,7 @@ namespace AdvancedCQRS.DocumentMessaging
     class PriceOrder: MessageBase
     {
         public JObject Order { get; }
-        public PriceOrder(JObject Order, MessageBase cause): base(cause.CorrelationId, cause.CauseId)
+        public PriceOrder(JObject Order, MessageBase cause): base(cause.CorrelationId, cause.Id)
         {
             this.Order = Order;
         }
