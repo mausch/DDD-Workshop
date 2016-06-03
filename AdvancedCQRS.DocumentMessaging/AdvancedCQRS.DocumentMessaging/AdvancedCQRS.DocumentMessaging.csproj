@@ -64,6 +64,7 @@
     <Compile Include="Monitor.cs" />
     <Compile Include="MoreFairDispatcher.cs" />
     <Compile Include="ProcessManager.cs" />
+    <Compile Include="ProcessManagerFactory.cs" />
     <Compile Include="TakePayment.cs" />
     <Compile Include="OrderPaid.cs" />
     <Compile Include="OrderPlaced.cs" />
