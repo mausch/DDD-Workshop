@@ -6,7 +6,7 @@ namespace AdvancedCQRS.DocumentMessaging
 {
     class TypeBasedPubSub: IPublisher
     {
-        readonly Dictionary<string, IReadOnlyCollection<object>> handlerMap = new Dictionary<string, IReadOnlyCollection<object>>();
+        readonly Dictionary<string, ISet<object>> handlerMap = new Dictionary<string, ISet<object>>();
 
         public void Publish<TMessage>(TMessage @event) where TMessage : MessageBase
         {
@@ -16,11 +16,12 @@ namespace AdvancedCQRS.DocumentMessaging
 
         void Handle<TMessage>(string key, TMessage @event) where TMessage: MessageBase
         {
-            IReadOnlyCollection<object> handlers;
+            ISet<object> handlers;
             if (!handlerMap.TryGetValue(key, out handlers))
                 return;
             if (handlers.Count == 0)
                 return;
+            //Console.WriteLine($"{handlers.Count} handlers for key {key}");
             Handle(handlers, @event);
         }
 
@@ -41,11 +42,12 @@ namespace AdvancedCQRS.DocumentMessaging
         {
             lock (subscriptionLock)
             {
-                IReadOnlyCollection<object> handlers;
+                //Console.WriteLine($"subscribed {handler} for key {key}");
+                ISet<object> handlers;
                 handlerMap.TryGetValue(key, out handlers);
                 var newHandlers = handlers?.ToList() ?? new List<object>();
                 newHandlers.Add(handler);
-                handlerMap[key] = newHandlers;
+                handlerMap[key] = new HashSet<object>(newHandlers);
             }
         }
 
@@ -73,11 +75,11 @@ namespace AdvancedCQRS.DocumentMessaging
         {
             lock (subscriptionLock)
             {
-                IReadOnlyCollection<object> handlers;
+                ISet<object> handlers;
                 handlerMap.TryGetValue(key, out handlers);
                 var newHandlers = handlers ?? Enumerable.Empty<object>();
                 newHandlers = newHandlers.Where(x => x != handler);
-                handlerMap[key] = newHandlers.ToList();
+                handlerMap[key] = new HashSet<object>(newHandlers);
             }
         }
 
