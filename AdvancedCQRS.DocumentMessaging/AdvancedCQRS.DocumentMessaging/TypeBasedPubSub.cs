@@ -62,17 +62,26 @@ namespace AdvancedCQRS.DocumentMessaging
             Subscribe(correlationId.ToString(), handler);
         }
 
-        public void Unsubscribe<TMessage>(IHandle<TMessage> handler) 
-            where TMessage: MessageBase
+        public void UnsubcribeByCorrelationId(Guid correlationId, IHandle handler)
+        {
+            Unsubcribe(correlationId.ToString(), handler);
+        }
+
+        void Unsubcribe(string key, object handler)
         {
             lock (subscriptionLock)
             {
                 IReadOnlyCollection<object> handlers;
-                handlerMap.TryGetValue(typeof(TMessage).ToString(), out handlers);
+                handlerMap.TryGetValue(key, out handlers);
                 var newHandlers = handlers ?? Enumerable.Empty<object>();
                 newHandlers = newHandlers.Where(x => x != handler);
-                handlerMap[typeof(TMessage).ToString()] = newHandlers.ToList();
+                handlerMap[key] = newHandlers.ToList();
             }
+        }
+
+        public void Unsubscribe<TMessage>(IHandle<TMessage> handler) where TMessage: MessageBase
+        {
+            Unsubcribe(typeof(TMessage).ToString(), handler);
         }
 
     }

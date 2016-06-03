@@ -7,15 +7,18 @@ namespace AdvancedCQRS.DocumentMessaging
     class ProcessManager : IHandle<OrderPlaced>, IHandle<FoodCooked>, IHandle<OrderPriced>, IHandle<OrderPaid>
     {
         readonly IPublisher publisher;
+        readonly ProcessManagerFactory factory;
 
-        public ProcessManager(IPublisher publisher)
+        public ProcessManager(IPublisher publisher, ProcessManagerFactory factory)
         {
             this.publisher = publisher;
+            this.factory = factory;
         }
 
         public void Handle(OrderPaid @event)
         {
             Console.WriteLine("Paid " + @event.CorrelationId);
+            factory.Handle(@event);
         }
 
         public void Handle(OrderPriced @event)
@@ -34,7 +37,7 @@ namespace AdvancedCQRS.DocumentMessaging
         }
     }
 
-    class ProcessManagerFactory : IHandle<OrderPlaced> //, IHandle<OrderPaid>, IHandle<FoodCooked>, IHandle<OrderPriced>
+    class ProcessManagerFactory : IHandle<OrderPlaced>
     {
         readonly Dictionary<Guid, ProcessManager> procManagers = new Dictionary<Guid, ProcessManager>();
         readonly TypeBasedPubSub pubsub;
@@ -44,33 +47,19 @@ namespace AdvancedCQRS.DocumentMessaging
             this.pubsub = pubsub;
         }
 
-        public void Handle(FoodCooked @event)
-        {
-            procManagers[@event.CorrelationId].Handle(@event);
-        }
-
-        public void Handle(OrderPriced @event)
-        {
-            procManagers[@event.CorrelationId].Handle(@event);
-        }
-
         public void Handle(OrderPaid @event)
         {
-            //procManagers[@event.CorrelationId].Handle(@event);
+            procManagers.Remove(@event.CorrelationId);
         }
 
         public void Handle(OrderPlaced @event)
         {
-            var procManager = new ProcessManager(pubsub);
+            var procManager = new ProcessManager(pubsub, this);
             procManagers[@event.CorrelationId] = procManager;
             pubsub.SubscribeByCorrelationId<FoodCooked>(@event.CorrelationId, procManager);
             pubsub.SubscribeByCorrelationId<OrderPriced>(@event.CorrelationId, procManager);
             pubsub.SubscribeByCorrelationId<OrderPaid>(@event.CorrelationId, procManager);
-            //pubsub.SubscribeByCorrelationId(@event.CorrelationId, procManager);
             procManager.Handle(@event);
         }
-
-        // TODO clean up from dictionary when done
-
     }
 }
