@@ -16,9 +16,9 @@ namespace AdvancedCQRS.DocumentMessaging
             this.pubsub = pubsub;
         }
 
-        public void Handle(OrderPaid @event)
+        public void Remove(Guid id)
         {
-            procManagers.Remove(@event.CorrelationId);
+            procManagers.Remove(id);
         }
 
         public void Handle(OrderPlaced @event)

@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    class ProcessManager : IHandle<OrderPlaced>, IHandle<FoodCooked>, IHandle<OrderPriced>, IHandle<OrderPaid>
+    class ProcessManager2 : IHandle<OrderPlaced>, IHandle<FoodCooked>, IHandle<OrderPriced>, IHandle<OrderPaid>
     {
         readonly IPublisher publisher;
         readonly ProcessManagerFactory factory;
 
-        public ProcessManager(IPublisher publisher, ProcessManagerFactory factory)
+        public ProcessManager2(IPublisher publisher, ProcessManagerFactory factory)
         {
             this.publisher = publisher;
             this.factory = factory;
@@ -17,8 +19,7 @@ namespace AdvancedCQRS.DocumentMessaging
 
         public void Handle(OrderPaid @event)
         {
-            Console.WriteLine("Paid " + @event.CorrelationId);
-            factory.Remove(@event.CorrelationId);
+            publisher.Publish(new CookFood(@event.Order, @event));
         }
 
         public void Handle(OrderPriced @event)
@@ -28,13 +29,13 @@ namespace AdvancedCQRS.DocumentMessaging
 
         public void Handle(FoodCooked @event)
         {
-            publisher.Publish(new PriceOrder(@event.Order, @event));
+            Console.WriteLine("Cooked " + @event.CorrelationId);
+            factory.Remove(@event.CorrelationId);
         }
 
         public void Handle(OrderPlaced @event)
         {
-            publisher.Publish(new CookFood(@event.Order, @event));
+            publisher.Publish(new PriceOrder(@event.Order, @event));
         }
     }
-
 }
