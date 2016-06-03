@@ -10,32 +10,56 @@ namespace AdvancedCQRS.DocumentMessaging
 
         public void Publish<TMessage>(TMessage @event) where TMessage : MessageBase
         {
+            Handle(@event.GetType().ToString(), @event);
+            Handle(@event.CorrelationId.ToString(), @event);
+        }
+
+        void Handle<TMessage>(string key, TMessage @event) where TMessage: MessageBase
+        {
             IReadOnlyCollection<object> handlersByType;
-            handlerMap.TryGetValue(@event.GetType().ToString(), out handlersByType);
+            handlerMap.TryGetValue(key, out handlersByType);
             handlersByType = handlersByType ?? new object[0];
+            Handle<TMessage>(handlersByType, @event);
+        }
 
-            IReadOnlyCollection<object> handlersByCorrelationId;
-            handlerMap.TryGetValue(@event.CorrelationId.ToString(), out handlersByCorrelationId);
-            handlersByCorrelationId = handlersByCorrelationId ?? new object[0];
-
-            var handlers = handlersByType.Concat(handlersByCorrelationId);
+        void Handle<TMessage>(IEnumerable<object> handlers, TMessage @event) where TMessage: MessageBase
+        {
             var typedhandlers = handlers.Select(x => x as IHandle<TMessage>).Where(x => x != null);
             foreach (var h in typedhandlers)
+                h.Handle(@event);
+
+            var nonTypedHandlers = handlers.Select(x => x as IHandle).Where(x => x != null);
+            foreach (var h in nonTypedHandlers)
                 h.Handle(@event);
         }
 
         readonly object subscriptionLock = new object();
 
-        public void Subscribe<TMessage>(IHandle<TMessage> handler) where TMessage: MessageBase
+        void Subscribe(string key, object handler)
         {
             lock (subscriptionLock)
             {
                 IReadOnlyCollection<object> handlers;
-                handlerMap.TryGetValue(typeof(TMessage).ToString(), out handlers);
+                handlerMap.TryGetValue(key, out handlers);
                 var newHandlers = handlers?.ToList() ?? new List<object>();
                 newHandlers.Add(handler);
-                handlerMap[typeof(TMessage).ToString()] = newHandlers;
+                handlerMap[key] = newHandlers;
             }
+        }
+
+        public void Subscribe<TMessage>(IHandle<TMessage> handler) where TMessage: MessageBase
+        {
+            Subscribe(typeof(TMessage).ToString(), handler);
+        }
+
+        public void SubscribeByCorrelationId<TMessage>(Guid correlationId, IHandle<TMessage> handler) where TMessage: MessageBase
+        {
+            Subscribe(correlationId.ToString(), handler);
+        }
+
+        public void SubscribeByCorrelationId(Guid correlationId, IHandle handler)
+        {
+            Subscribe(correlationId.ToString(), handler);
         }
 
         public void Unsubscribe<TMessage>(IHandle<TMessage> handler) 

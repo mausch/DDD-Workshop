@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    interface IHandle
+    class Monitor : IHandle
     {
-        void Handle(MessageBase @event);
-    }
-
-    interface IHandle<T>
-    {
-        void Handle(T @event);
+        public void Handle(MessageBase @event)
+        {
+            Console.WriteLine(@event);
+        }
     }
 }

@@ -41,9 +41,12 @@ namespace AdvancedCQRS.DocumentMessaging
 
             var waiter = new Waiter(pubsub);
 
+            pubsub.Subscribe(new ProcessManagerFactory(pubsub));
+
             for (int i = 1; i < 300; i++)
             {
-                waiter.TakeOrder(i, CreateOrder());
+                var id = waiter.TakeOrder(i, CreateOrder());
+                pubsub.SubscribeByCorrelationId(id, new Monitor());
             }
 
             foreach (var c in startables)
