@@ -4,13 +4,18 @@ using System.Linq;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    class ProcessManager : IHandle<OrderPlaced>, IHandle<FoodCooked>, IHandle<OrderPriced>
+    class ProcessManager : IHandle<OrderPlaced>, IHandle<FoodCooked>, IHandle<OrderPriced>, IHandle<OrderPaid>
     {
         readonly TypeBasedPubSub pubsub;
 
         public ProcessManager(TypeBasedPubSub pubsub)
         {
             this.pubsub = pubsub;
+        }
+
+        public void Handle(OrderPaid @event)
+        {
+            Console.WriteLine("Paid " + @event.CorrelationId);
         }
 
         public void Handle(OrderPriced @event)
@@ -29,7 +34,7 @@ namespace AdvancedCQRS.DocumentMessaging
         }
     }
 
-    class ProcessManagerFactory : IHandle<OrderPlaced>, IHandle<OrderPaid>, IHandle<FoodCooked>, IHandle<OrderPriced>
+    class ProcessManagerFactory : IHandle<OrderPlaced> //, IHandle<OrderPaid>, IHandle<FoodCooked>, IHandle<OrderPriced>
     {
         readonly Dictionary<Guid, ProcessManager> procManagers = new Dictionary<Guid, ProcessManager>();
         readonly TypeBasedPubSub pubsub;
@@ -58,6 +63,9 @@ namespace AdvancedCQRS.DocumentMessaging
         {
             var procManager = new ProcessManager(pubsub);
             procManagers[@event.CorrelationId] = procManager;
+            pubsub.SubscribeByCorrelationId<FoodCooked>(@event.CorrelationId, procManager);
+            pubsub.SubscribeByCorrelationId<OrderPriced>(@event.CorrelationId, procManager);
+            pubsub.SubscribeByCorrelationId<OrderPaid>(@event.CorrelationId, procManager);
             //pubsub.SubscribeByCorrelationId(@event.CorrelationId, procManager);
             procManager.Handle(@event);
         }
