@@ -64,10 +64,10 @@ namespace AdvancedCQRS.DocumentMessaging
 
         public void UnsubcribeByCorrelationId(Guid correlationId, IHandle handler)
         {
-            Unsubcribe(correlationId.ToString(), handler);
+            Unsubscribe(correlationId.ToString(), handler);
         }
 
-        void Unsubcribe(string key, object handler)
+        void Unsubscribe(string key, object handler)
         {
             lock (subscriptionLock)
             {
@@ -81,7 +81,7 @@ namespace AdvancedCQRS.DocumentMessaging
 
         public void Unsubscribe<TMessage>(IHandle<TMessage> handler) where TMessage: MessageBase
         {
-            Unsubcribe(typeof(TMessage).ToString(), handler);
+            Unsubscribe(typeof(TMessage).ToString(), handler);
         }
 
     }
