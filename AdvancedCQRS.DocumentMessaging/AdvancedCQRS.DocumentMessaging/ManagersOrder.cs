@@ -25,7 +25,7 @@ namespace AdvancedCQRS.DocumentMessaging
             order.Tax = tax;
             order.Total = totalWithoutTax + tax;
 
-            _orderHandler.Publish(new OrderPriced(order.InnerItem));
+            _orderHandler.Publish(new OrderPriced(order.InnerItem, @event));
         }
     }
 

@@ -17,7 +17,7 @@ namespace AdvancedCQRS.DocumentMessaging
             var order = new CashiersOrder(@event.Order);
             order.IsPaid = true;
 
-            _orderHandler.Publish(new OrderPaid(order.InnerItem));
+            _orderHandler.Publish(new OrderPaid(order.InnerItem, @event));
         }
     }
 

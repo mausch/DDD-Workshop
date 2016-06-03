@@ -10,7 +10,8 @@ namespace AdvancedCQRS.DocumentMessaging
     class CookFood: MessageBase
     {
         public JObject Order { get; }
-        public CookFood(JObject Order): base()
+
+        public CookFood(JObject Order, MessageBase cause): base(cause.CorrelationId, cause.CauseId)
         {
             this.Order = Order;
         }

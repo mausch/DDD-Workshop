@@ -8,7 +8,7 @@ namespace AdvancedCQRS.DocumentMessaging
     class TakePayment: MessageBase
     {
         public JObject Order { get; }
-        public TakePayment(JObject Order): base()
+        public TakePayment(JObject Order, MessageBase cause): base(cause.CorrelationId, cause.CauseId)
         {
             this.Order = Order;
         }

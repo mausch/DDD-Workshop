@@ -48,7 +48,7 @@ namespace AdvancedCQRS.DocumentMessaging
             order.Ingredients = string.Join(", ", order.Items.Select(FindIngredients));
             order.CookedAt = DateTime.Now;
 
-            _orderHandler.Publish(new FoodCooked(order.InnerItem));
+            _orderHandler.Publish(new FoodCooked(order.InnerItem, @event));
         }
     }
 

@@ -8,7 +8,8 @@ namespace AdvancedCQRS.DocumentMessaging
     class OrderPlaced: MessageBase
     {
         public JObject Order { get; }
-        public OrderPlaced(JObject Order): base()
+
+        public OrderPlaced(JObject Order): base(CorrelationId: Guid.NewGuid(), CauseId: null)
         {
             this.Order = Order;
         }
