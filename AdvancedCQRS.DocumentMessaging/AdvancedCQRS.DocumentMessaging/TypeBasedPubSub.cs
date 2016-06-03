@@ -19,7 +19,7 @@ namespace AdvancedCQRS.DocumentMessaging
             IReadOnlyCollection<object> handlersByType;
             handlerMap.TryGetValue(key, out handlersByType);
             handlersByType = handlersByType ?? new object[0];
-            Handle<TMessage>(handlersByType, @event);
+            Handle(handlersByType, @event);
         }
 
         void Handle<TMessage>(IEnumerable<object> handlers, TMessage @event) where TMessage: MessageBase

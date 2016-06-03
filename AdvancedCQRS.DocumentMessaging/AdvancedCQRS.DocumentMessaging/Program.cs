@@ -41,7 +41,11 @@ namespace AdvancedCQRS.DocumentMessaging
 
             var waiter = new Waiter(pubsub);
 
-            pubsub.Subscribe(new ProcessManagerFactory(pubsub));
+            var procManagerFactory = QueuedHandler.Create(new ProcessManagerFactory(pubsub), "process manager factory");
+            startables.Add(procManagerFactory);
+            queues.Add(procManagerFactory);
+            //var procManagerFactory = new ProcessManagerFactory(pubsub);
+            pubsub.Subscribe(procManagerFactory);
 
             for (int i = 1; i < 300; i++)
             {

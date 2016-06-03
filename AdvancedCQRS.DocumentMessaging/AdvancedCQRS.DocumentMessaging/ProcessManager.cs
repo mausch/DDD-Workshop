@@ -33,7 +33,8 @@ namespace AdvancedCQRS.DocumentMessaging
         {
             var procManager = new ProcessManager(pubsub);
             procManagers[@event.CorrelationId] = procManager;
-            pubsub.SubscribeByCorrelationId(@event.CorrelationId, procManager);
+            //pubsub.SubscribeByCorrelationId(@event.CorrelationId, procManager);
+            procManager.Handle(@event);
         }
 
         // TODO clean up from dictionary when done
