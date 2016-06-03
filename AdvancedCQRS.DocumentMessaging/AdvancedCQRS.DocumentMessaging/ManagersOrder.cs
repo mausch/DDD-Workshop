@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    class Manager : IHandle<FoodCooked>
+    class Manager : IHandle<PriceOrder>
     {
         private readonly IPublisher _orderHandler;
 
@@ -15,7 +15,7 @@ namespace AdvancedCQRS.DocumentMessaging
             _orderHandler = orderHandler;
         }
 
-        public void Handle(FoodCooked @event)
+        public void Handle(PriceOrder @event)
         {
             var order = new ManagersOrder(@event.Order);
 

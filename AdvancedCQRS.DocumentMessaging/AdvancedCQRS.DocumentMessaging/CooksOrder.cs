@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    class Cook : IHandle<OrderPlaced>
+    class Cook : IHandle<CookFood>
     {
         private readonly IPublisher _orderHandler;
         public string Name { get; }
@@ -37,7 +37,7 @@ namespace AdvancedCQRS.DocumentMessaging
             return _ingredientsMap[$"random{new Random().Next(1, 3)}"];
         }
 
-        public void Handle(OrderPlaced @event)
+        public void Handle(CookFood @event)
         {
             //Console.WriteLine(Name + " is cooking");
             var order = new CooksOrder(@event.Order);
