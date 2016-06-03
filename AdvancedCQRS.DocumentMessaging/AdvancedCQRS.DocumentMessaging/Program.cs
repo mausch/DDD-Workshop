@@ -39,9 +39,13 @@ namespace AdvancedCQRS.DocumentMessaging
             queues.Add(rrCooks);
             pubsub.Subscribe(rrCooks);
 
+            var delayed = new DelayedMessageHandler<RetryCookFood>(pubsub);
+            pubsub.Subscribe(delayed);
+            startables.Add(delayed);
+
             var waiter = new Waiter(pubsub);
 
-            var procManagerFactory = QueuedHandler.Create<OrderPlaced>(new ProcessManagerFactory(pubsub), "process manager factory");
+            var procManagerFactory = QueuedHandler.Create(new ProcessManagerFactory(pubsub), "process manager factory");
             startables.Add(procManagerFactory);
             queues.Add(procManagerFactory);
             //var procManagerFactory = new ProcessManagerFactory(pubsub);

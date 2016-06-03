@@ -29,6 +29,7 @@ namespace AdvancedCQRS.DocumentMessaging
 
         public void Handle(FoodCooked @event)
         {
+            isCooked = true;
             Console.WriteLine("Cooked " + @event.CorrelationId);
             factory.Remove(@event.CorrelationId);
         }
@@ -37,5 +38,15 @@ namespace AdvancedCQRS.DocumentMessaging
         {
             publisher.Publish(new PriceOrder(@event.Order, @event));
         }
+
+        bool isCooked = false;
+
+        public void Handle(RetryCookFood @event)
+        {
+            if (isCooked)
+                return;
+            Console.WriteLine("retrying cooking");
+            publisher.Publish(@event.Message);
+         }
     }
 }

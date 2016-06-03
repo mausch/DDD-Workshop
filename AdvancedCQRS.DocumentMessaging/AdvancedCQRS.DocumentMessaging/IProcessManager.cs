@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    interface IProcessManager: IHandle<OrderPlaced>, IHandle<FoodCooked>, IHandle<OrderPriced>, IHandle<OrderPaid>
+    interface IProcessManager: IHandle<OrderPlaced>, IHandle<FoodCooked>, IHandle<OrderPriced>, IHandle<OrderPaid>, IHandle<RetryCookFood>
     {
     }
 }

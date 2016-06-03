@@ -54,6 +54,7 @@
     <Compile Include="CashiersOrder.cs" />
     <Compile Include="CookFood.cs" />
     <Compile Include="CooksOrder.cs" />
+    <Compile Include="DelayedMessageHandler.cs" />
     <Compile Include="DroppingHandler.cs" />
     <Compile Include="FoodCooked.cs" />
     <Compile Include="IHandle.cs" />
@@ -68,6 +69,8 @@
     <Compile Include="ProcessManager.cs" />
     <Compile Include="ProcessManager2.cs" />
     <Compile Include="ProcessManagerFactory.cs" />
+    <Compile Include="DelayedMessage.cs" />
+    <Compile Include="RetryCookFood.cs" />
     <Compile Include="TakePayment.cs" />
     <Compile Include="OrderPaid.cs" />
     <Compile Include="OrderPlaced.cs" />
