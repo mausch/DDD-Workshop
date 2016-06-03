@@ -30,7 +30,7 @@ namespace AdvancedCQRS.DocumentMessaging
                 new Cook(pubsub, "Tom", rnd.Next(10, 1000)),
                 new Cook(pubsub, "Jane", rnd.Next(10, 1000)),
                 new Cook(pubsub, "Dan", rnd.Next(10, 1000)),
-            }.Select(x => QueuedHandler.Create(x, x.Name)).ToList();
+            }.Select(x => QueuedHandler.Create(DroppingHandler.Create(x), x.Name)).ToList();
             startables.AddRange(cooks);
             queues.AddRange(cooks);
 

@@ -54,6 +54,7 @@
     <Compile Include="CashiersOrder.cs" />
     <Compile Include="CookFood.cs" />
     <Compile Include="CooksOrder.cs" />
+    <Compile Include="DroppingHandler.cs" />
     <Compile Include="FoodCooked.cs" />
     <Compile Include="IHandle.cs" />
     <Compile Include="IProcessManager.cs" />

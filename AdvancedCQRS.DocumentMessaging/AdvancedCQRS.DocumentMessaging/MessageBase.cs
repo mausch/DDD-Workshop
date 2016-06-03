@@ -17,5 +17,10 @@ namespace AdvancedCQRS.DocumentMessaging
             this.CorrelationId = CorrelationId;
             this.CauseId = CauseId;
         }
+
+        public override string ToString()
+        {
+            return $"{GetType().Name}, id={Id}, CorrelationId={CorrelationId}, cause={CauseId}";
+        }
     }
 }
