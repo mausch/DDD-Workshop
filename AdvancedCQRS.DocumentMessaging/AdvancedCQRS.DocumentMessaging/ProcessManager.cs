@@ -6,11 +6,11 @@ namespace AdvancedCQRS.DocumentMessaging
 {
     class ProcessManager : IHandle<OrderPlaced>, IHandle<FoodCooked>, IHandle<OrderPriced>, IHandle<OrderPaid>
     {
-        readonly TypeBasedPubSub pubsub;
+        readonly IPublisher publisher;
 
-        public ProcessManager(TypeBasedPubSub pubsub)
+        public ProcessManager(IPublisher publisher)
         {
-            this.pubsub = pubsub;
+            this.publisher = publisher;
         }
 
         public void Handle(OrderPaid @event)
@@ -20,17 +20,17 @@ namespace AdvancedCQRS.DocumentMessaging
 
         public void Handle(OrderPriced @event)
         {
-            pubsub.Publish(new TakePayment(@event.Order, @event));
+            publisher.Publish(new TakePayment(@event.Order, @event));
         }
 
         public void Handle(FoodCooked @event)
         {
-            pubsub.Publish(new PriceOrder(@event.Order, @event));
+            publisher.Publish(new PriceOrder(@event.Order, @event));
         }
 
         public void Handle(OrderPlaced @event)
         {
-            pubsub.Publish(new CookFood(@event.Order, @event));
+            publisher.Publish(new CookFood(@event.Order, @event));
         }
     }
 
