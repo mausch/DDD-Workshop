@@ -21,19 +21,24 @@ namespace AdvancedCQRS.DocumentMessaging
             procManagers.Remove(id);
         }
 
-        public void Handle(OrderPlaced @event)
+        IProcessManager BuildProcessManager(OrderPlaced @event)
         {
             var order = new WaitersOrder(@event.Order);
             IProcessManager procManager = new ProcessManager(pubsub, this);
             if (order.IsDodgy)
             {
-                procManager = new ProcessManager(pubsub, this);
+                return new ProcessManager(pubsub, this);
 
             } else
             {
                 Console.WriteLine("dodgy order!");
-                procManager = new ProcessManager2(pubsub, this);
+                return new ProcessManager2(pubsub, this);
             }
+        }
+
+        public void Handle(OrderPlaced @event)
+        {
+            var procManager = BuildProcessManager(@event);
             procManagers[@event.CorrelationId] = procManager;
             pubsub.SubscribeByCorrelationId<FoodCooked>(@event.CorrelationId, procManager);
             pubsub.SubscribeByCorrelationId<OrderPriced>(@event.CorrelationId, procManager);
