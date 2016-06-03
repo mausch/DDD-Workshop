@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    class ProcessManager2 : IHandle<OrderPlaced>, IHandle<FoodCooked>, IHandle<OrderPriced>, IHandle<OrderPaid>
+    class ProcessManager2 : IProcessManager
     {
         readonly IPublisher publisher;
         readonly ProcessManagerFactory factory;

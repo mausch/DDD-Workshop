@@ -8,7 +8,7 @@ namespace AdvancedCQRS.DocumentMessaging
 {
     class ProcessManagerFactory : IHandle<OrderPlaced>
     {
-        readonly Dictionary<Guid, ProcessManager> procManagers = new Dictionary<Guid, ProcessManager>();
+        readonly Dictionary<Guid, IProcessManager> procManagers = new Dictionary<Guid, IProcessManager>();
         readonly TypeBasedPubSub pubsub;
 
         public ProcessManagerFactory(TypeBasedPubSub pubsub)
@@ -23,7 +23,17 @@ namespace AdvancedCQRS.DocumentMessaging
 
         public void Handle(OrderPlaced @event)
         {
-            var procManager = new ProcessManager(pubsub, this);
+            var order = new WaitersOrder(@event.Order);
+            IProcessManager procManager = new ProcessManager(pubsub, this);
+            if (order.IsDodgy)
+            {
+                procManager = new ProcessManager(pubsub, this);
+
+            } else
+            {
+                Console.WriteLine("dodgy order!");
+                procManager = new ProcessManager2(pubsub, this);
+            }
             procManagers[@event.CorrelationId] = procManager;
             pubsub.SubscribeByCorrelationId<FoodCooked>(@event.CorrelationId, procManager);
             pubsub.SubscribeByCorrelationId<OrderPriced>(@event.CorrelationId, procManager);

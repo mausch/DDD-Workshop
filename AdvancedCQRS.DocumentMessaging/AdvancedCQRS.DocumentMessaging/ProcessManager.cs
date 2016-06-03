@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdvancedCQRS.DocumentMessaging
 {
-    class ProcessManager : IHandle<OrderPlaced>, IHandle<FoodCooked>, IHandle<OrderPriced>, IHandle<OrderPaid>
+    class ProcessManager : IProcessManager
     {
         readonly IPublisher publisher;
         readonly ProcessManagerFactory factory;

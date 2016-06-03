@@ -13,12 +13,15 @@ namespace AdvancedCQRS.DocumentMessaging
             _orderHandler = orderHandler;
         }
 
+        readonly Random rnd = new Random();
+
         public Guid TakeOrder(int tableNumber, IEnumerable<LineItem> items)
         {
             var order = new WaitersOrder(new JObject());
             order.Id = Guid.NewGuid();
             order.TableNumber = tableNumber;
             order.OrderTakenAt = DateTime.Now;
+            order.IsDodgy = rnd.Next(0, 2) == 0;
             
             foreach (var item in items)
             {
@@ -58,6 +61,12 @@ namespace AdvancedCQRS.DocumentMessaging
         {
             get { return (int)_order["TableNumber"]; }
             set { _order["TableNumber"] = value; }
+        }
+
+        public bool IsDodgy
+        {
+            get { return (bool)_order["IsDodgy"]; }
+            set { _order["IsDodgy"] = value;  }
         }
 
         public void AddItem(LineItem item)
